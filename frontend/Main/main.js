@@ -15,7 +15,7 @@ window.addEventListener("DOMContentLoaded", function () {
         const MessageDiv = document.getElementById("message");
         MessageDiv.textContent = "";
         for (var i = 0; i < response.data.messages.length; i++) {
-          //console.log(response.data.messages[i])
+          console.log(response.data.messages[i])
           MessageArr1.push(response.data.messages[i]);
           console.log(
             response.data.messages[response.data.messages.length - 1].id
@@ -83,6 +83,13 @@ SendButton.addEventListener("click", function () {
 function ShowMessages(message) {
   const MessageDiv = document.getElementById("message");
   const Li = document.createElement("li");
-  Li.textContent = `${message.content}`;
+  Li.textContent = `${message.User.name} : ${message.content}`;
   MessageDiv.appendChild(Li);
 }
+
+
+const CreateGroup=document.getElementById("CreateGroup");
+
+CreateGroup.addEventListener("click",function(){
+  window.location.href='../GroupEntryPoint/entry.html'
+})

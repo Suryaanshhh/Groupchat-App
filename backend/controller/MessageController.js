@@ -14,17 +14,25 @@ exports.AddMessage = (req, res, next) => {
 };
 
 exports.GetMessage = (req, res, next) => {
-  let messageId = (req.query.messageId)
+  let messageId = req.query.messageId;
   if (messageId === undefined) {
     messageId = -1;
   }
   console.log(messageId);
   Messages.findAll({
     where: {
+      UserId: req.user.id,
+
       id: {
         [sq.Op.gt]: messageId,
       },
     },
+    include: [
+      {
+        model: User,
+        attributes: ["name"],
+      },
+    ],
   })
     .then((messages) => {
       res.status(200).json({ messages });
