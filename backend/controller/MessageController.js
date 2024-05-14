@@ -1,7 +1,7 @@
 const User = require("../models/user");
 const Messages = require("../models/message");
 const { response } = require("express");
-
+const sq = require("sequelize");
 exports.AddMessage = (req, res, next) => {
   const Message = req.body.Message;
   const Id = req.user.id;
@@ -14,10 +14,23 @@ exports.AddMessage = (req, res, next) => {
 };
 
 exports.GetMessage = (req, res, next) => {
-  Messages.findAll().then((messages) => {
-    res.status(201).json({ messages });
-  }).catch(err=>{
-    console.log(err);
-    res.status(500).json({message:"something went wrong"})
-  });
+  let messageId = (req.query.messageId)
+  if (messageId === undefined) {
+    messageId = -1;
+  }
+  console.log(messageId);
+  Messages.findAll({
+    where: {
+      id: {
+        [sq.Op.gt]: messageId,
+      },
+    },
+  })
+    .then((messages) => {
+      res.status(200).json({ messages });
+    })
+    .catch((err) => {
+      console.log(err);
+      res.status(500).json({ message: "something went wrong" });
+    });
 };
