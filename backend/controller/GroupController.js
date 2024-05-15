@@ -19,3 +19,16 @@ exports.CreateGroup = (req, res, next) => {
       console.log(err);
     });
 };
+
+exports.getGroupList = (req, res, next) => {
+  Groups.findAll({
+    attributes: ["name","id"],
+  })
+    .then((name) => {
+      res.status(200).json({ name });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
+

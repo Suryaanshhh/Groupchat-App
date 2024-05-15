@@ -8,15 +8,7 @@ exports.authenticator = (req, res, next) => {
     User.findByPk(user.userId)
       .then((user) => {
         req.user = user;
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    Group.findAll()
-      .then((group) => {
-        //console.log(group)
-        req.group = group;
-        next();
+        next()
       })
       .catch((err) => {
         console.log(err);

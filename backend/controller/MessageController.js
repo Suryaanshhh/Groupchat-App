@@ -31,20 +31,17 @@ exports.AddMessage = async (req, res, next) => {
 
 exports.GetMessage = async (req, res, next) => {
   const Id = req.user.id;
+  console.log(Id);
   let messageId = req.query.messageId;
   if (messageId === undefined) {
     messageId = -1;
   }
-  const Gid = await Group.findAll({
-    where: {
-      UserId: Id,
-    },
-  });
-  const GroupID = Gid[0].dataValues.id;
-  console.log(messageId);
+
+  const GroupID = req.query.group||1;
+  console.log(`GiD--------is ${GroupID}`);
   await Messages.findAll({
     where: {
-      UserId: req.user.id,
+      UserId: Id,
 
       id: {
         [sq.Op.gt]: messageId,
@@ -55,6 +52,10 @@ exports.GetMessage = async (req, res, next) => {
       {
         model: User,
         attributes: ["name"],
+      },
+      {
+        model: Group,
+        attributes: ["name","id"],
       },
     ],
   })
