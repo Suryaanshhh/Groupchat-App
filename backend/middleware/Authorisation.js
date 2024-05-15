@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
-const User = require('../models/user');
-
+const User = require("../models/user");
+const Group = require("../models/Group");
 exports.authenticator = (req, res, next) => {
   try {
     const token = req.header("Authorisation");
@@ -8,6 +8,14 @@ exports.authenticator = (req, res, next) => {
     User.findByPk(user.userId)
       .then((user) => {
         req.user = user;
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    Group.findAll()
+      .then((group) => {
+        //console.log(group)
+        req.group = group;
         next();
       })
       .catch((err) => {

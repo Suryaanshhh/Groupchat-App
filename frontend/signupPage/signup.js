@@ -12,7 +12,7 @@ submitBtn.addEventListener("click", function (event) {
     password: password,
     phone:phone
   };
-  if (name && email && password) {
+  if (RegisterUser) {
     axios
       .post("http://localhost:4000/register-user", RegisterUser)
       .then((response) => {

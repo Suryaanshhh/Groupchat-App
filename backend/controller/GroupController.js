@@ -1,0 +1,21 @@
+const User = require("../models/user");
+const Messages = require("../models/message");
+const Groups = require("../models/Group");
+const { response } = require("express");
+
+exports.CreateGroup = (req, res, next) => {
+  const GroupName = req.body.name;
+  const Uid = req.user.id;
+  Groups.create({
+    name: GroupName,
+    UserId: Uid,
+  })
+    .then((response) => {
+      res
+        .status(201)
+        .json({ response, message: "Group createdn successfully" });
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+};
