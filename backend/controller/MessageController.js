@@ -8,19 +8,13 @@ exports.AddMessage = async (req, res, next) => {
   try {
     const Message = req.body.Message;
     const Id = req.user.id;
-    const Gid = await Group.findAll({
-      where: {
-        UserId: Id,
-      },
-    });
-    console.log(Gid);
-    const GroupID = Gid[0].dataValues.id;
-    console.log(GroupID);
+    const Gid = req.body.groupId
+    console.log(`ihafdoiha0wfh0awjf-----${Gid}`)
 
     const response = await Messages.create({
       content: Message,
       UserId: Id,
-      GroupId: GroupID,
+      GroupId: Gid,
     });
     res.status(201).json({ response, message: "Sent successfully" });
   } catch (err) {
@@ -36,9 +30,9 @@ exports.GetMessage = async (req, res, next) => {
   if (messageId === undefined) {
     messageId = -1;
   }
-
-  const GroupID = req.query.group||1;
-  console.log(`GiD--------is ${GroupID}`);
+console.log(`mesdawefawfa----${messageId}`)
+  const GroupID = req.query.groupId || 1;
+  console.log(`GiD--------is ${req.query.groupId}`);
   await Messages.findAll({
     where: {
       UserId: Id,
