@@ -6,6 +6,8 @@ const GroupController=require('../controller/GroupController');
 
 Router.post('/createGroup',UserAuthenticatior.authenticator,GroupController.CreateGroup);
 
-Router.get("/getGroupList",UserAuthenticatior.authenticator,GroupController.getGroupList)
+Router.get("/getGroupList",UserAuthenticatior.authenticator,GroupController.getGroupList);
+
+
 
 module.exports=Router

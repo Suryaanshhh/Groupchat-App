@@ -2,7 +2,7 @@ const { Sequelize } = require("sequelize");
 
 const sq=require("../util/database");
 
-const Groups=sq.define("Group",{
+const Member=sq.define("Members",{
     id: {
         type: Sequelize.INTEGER,
         autoIncrement: true,
@@ -13,9 +13,7 @@ const Groups=sq.define("Group",{
         type:Sequelize.STRING,
         allowNull:false 
       },
-      admin:{
-        type:Sequelize.STRING,
-        allowNull:false,
-      }
-})
-module.exports=Groups;
+      
+});
+
+module.exports=Member

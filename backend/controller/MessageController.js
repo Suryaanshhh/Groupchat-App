@@ -35,8 +35,6 @@ console.log(`mesdawefawfa----${messageId}`)
   console.log(`GiD--------is ${req.query.groupId}`);
   await Messages.findAll({
     where: {
-      UserId: Id,
-
       id: {
         [sq.Op.gt]: messageId,
       },
