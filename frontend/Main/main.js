@@ -23,7 +23,7 @@ function showMembers(peeps) {
 
   Btn1.addEventListener("click", function removeUser() {
     console.log(Child.id);
-    axios.delete(`http://localhost:4000/RemoveMember/${Child.id}`).then(() => {
+    axios.delete(`https://groupchat-app-rtbo.onrender.com/RemoveMember/${Child.id}`).then(() => {
       alert("user removed from group");
       location.reload();
     });
@@ -36,7 +36,7 @@ function showMembers(peeps) {
       status: true,
     };
     axios
-      .post(`http://localhost:4000/MakeAdmin/${Child.id}/${Child.name}`, Admin, {
+      .post(`https://groupchat-app-rtbo.onrender.com/MakeAdmin/${Child.id}/${Child.name}`, Admin, {
         headers: { Authorisation: token },
       })
       .then(() => {
@@ -52,7 +52,7 @@ window.addEventListener("DOMContentLoaded", function () {
   console.log(decodedToken);
 
   axios
-    .get("http://localhost:4000/showMembers", {
+    .get("https://groupchat-app-rtbo.onrender.com/showMembers", {
       headers: { Authorisation: token },
     })
     .then((Response) => {
@@ -74,7 +74,7 @@ window.addEventListener("DOMContentLoaded", function () {
     const groupId = localStorage.getItem("Gid");
 
     axios
-      .get(`http://localhost:4000/get-message?groupId=${groupId}`, {
+      .get(`https://groupchat-app-rtbo.onrender.com/get-message?groupId=${groupId}`, {
         headers: {
           Authorisation: token,
         },
@@ -113,7 +113,7 @@ window.addEventListener("DOMContentLoaded", function () {
       });
 
     axios
-      .get("http://localhost:4000/getGroupList", {
+      .get("https://groupchat-app-rtbo.onrender.com/getGroupList", {
         headers: {
           Authorisation: token,
         },
@@ -143,7 +143,7 @@ SendButton.addEventListener("click", function () {
     groupId: groupId, // Make sure to send the groupId with the message
   };
   axios
-    .post("http://localhost:4000/add-message", Text, {
+    .post("https://groupchat-app-rtbo.onrender.com/add-message", Text, {
       headers: { Authorisation: token },
     })
     .then((response) => {

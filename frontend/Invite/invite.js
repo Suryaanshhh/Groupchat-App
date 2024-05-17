@@ -14,7 +14,7 @@ btn.addEventListener("click", function (e) {
   };
   if(name&&email&&phone){
     const token = localStorage.getItem("token");
-    axios.post("http://localhost:4000/InviteUser", User, {
+    axios.post("https://groupchat-app-rtbo.onrender.com/InviteUser", User, {
       headers: { Authorisation: token },
     }).then((response)=>{
       console.log(response)

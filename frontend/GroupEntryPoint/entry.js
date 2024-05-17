@@ -6,7 +6,7 @@ create.addEventListener("click", function () {
     name: name,
   };
   axios
-    .post("http://localhost:4000/createGroup", Group, {
+    .post("https://groupchat-app-rtbo.onrender.com/createGroup", Group, {
       headers: { Authorisation: token },
     })
     .then((response) => {
