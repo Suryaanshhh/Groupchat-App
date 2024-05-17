@@ -29,7 +29,8 @@ function showMembers(peeps) {
     });
   });
 
-  Btn2.addEventListener("click", function MakeAdmin() {
+  Btn2.addEventListener("click", function MakeAdmin(e) {
+    
     const token = localStorage.getItem("token");
     console.log(Child.name)
     const Admin = {
@@ -42,6 +43,8 @@ function showMembers(peeps) {
       .then(() => {
         alert("Admin made successfully");
         location.reload();
+      }).catch(err=>{
+        console.log(err)
       });
   });
 }
@@ -52,17 +55,17 @@ window.addEventListener("DOMContentLoaded", function () {
   console.log(decodedToken);
 
   axios
-    .get("https://groupchat-app-rtbo.onrender.com/showMembers", {
-      headers: { Authorisation: token },
-    })
-    .then((Response) => {
-      console.log(Response);
-      if (decodedToken.admin) {
-        for (var i = 0; i < Response.data.peopeles.length; i++) {
-          showMembers(Response.data.peopeles[i]);
-        }
+  .get("https://groupchat-app-rtbo.onrender.com/showMembers", {
+    headers: { Authorisation: token },
+  })
+  .then((Response) => {
+    console.log(Response);
+    if (decodedToken.admin) {
+      for (var i = 0; i < Response.data.peopeles.length; i++) {
+        showMembers(Response.data.peopeles[i]);
       }
-    });
+    }
+  });
 
   // Retrieve and display the group name from local storage
   const groupName = localStorage.getItem("GroupName");
