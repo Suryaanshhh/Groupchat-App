@@ -6,7 +6,7 @@ create.addEventListener("click", function () {
     name: name,
   };
   axios
-    .post("https://groupchat-app-three.vercel.app/createGroup", Group, {
+    .post("https://groupchat-app-gamma.vercel.app/createGroup", Group, {
       headers: { Authorisation: token },
     })
     .then((response) => {

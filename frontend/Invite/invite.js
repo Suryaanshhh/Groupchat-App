@@ -14,7 +14,7 @@ btn.addEventListener("click", function (e) {
   };
   if(name&&email&&phone){
     const token = localStorage.getItem("token");
-    axios.post("https://groupchat-app-three.vercel.app/InviteUser", User, {
+    axios.post("https://groupchat-app-gamma.vercel.app/InviteUser", User, {
       headers: { Authorisation: token },
     }).then((response)=>{
       console.log(response)
