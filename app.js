@@ -14,12 +14,13 @@ const bodyParser = require("body-parser");
 app.use(bodyParser.json({ extended: false }));
 app.use(Cors())
 
+//Routes
 
 app.use(UserRoutes);
 app.use(MessageRoute);
 app.use(GroupRouts)
 
-
+//Db Schema
 
 User.hasMany(Messages);
 Messages.belongsTo(User);
