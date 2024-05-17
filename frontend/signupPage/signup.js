@@ -14,7 +14,7 @@ submitBtn.addEventListener("click", function (event) {
   };
   if (name&&email&&password&&phone) {
     axios
-      .post("https://groupchat-app-rtbo.onrender.com/register-user", RegisterUser)
+      .post("https://groupchat-app-three.vercel.app/register-user", RegisterUser)
       .then((response) => {
         console.log(response)
             alert("Signup Successfull");

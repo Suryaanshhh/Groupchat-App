@@ -23,7 +23,7 @@ function showMembers(peeps) {
 
   Btn1.addEventListener("click", function removeUser() {
     console.log(Child.id);
-    axios.delete(`https://groupchat-app-rtbo.onrender.com/RemoveMember/${Child.id}`).then(() => {
+    axios.delete(`https://groupchat-app-three.vercel.app/RemoveMember/${Child.id}`).then(() => {
       alert("user removed from group");
       location.reload();
     });
@@ -37,7 +37,7 @@ function showMembers(peeps) {
       status: true,
     };
     axios
-      .post(`https://groupchat-app-rtbo.onrender.com/MakeAdmin/${Child.id}/${Child.name}`, Admin, {
+      .post(`https://groupchat-app-three.vercel.app/MakeAdmin/${Child.id}/${Child.name}`, Admin, {
         headers: { Authorisation: token },
       })
       .then(() => {
@@ -55,7 +55,7 @@ window.addEventListener("DOMContentLoaded", function () {
   console.log(decodedToken);
 
   axios
-  .get("https://groupchat-app-rtbo.onrender.com/showMembers", {
+  .get("https://groupchat-app-three.vercel.app/showMembers", {
     headers: { Authorisation: token },
   })
   .then((Response) => {
@@ -77,7 +77,7 @@ window.addEventListener("DOMContentLoaded", function () {
     const groupId = localStorage.getItem("Gid");
 
     axios
-      .get(`https://groupchat-app-rtbo.onrender.com/get-message?groupId=${groupId}`, {
+      .get(`https://groupchat-app-three.vercel.app/get-message?groupId=${groupId}`, {
         headers: {
           Authorisation: token,
         },
@@ -116,7 +116,7 @@ window.addEventListener("DOMContentLoaded", function () {
       });
 
     axios
-      .get("https://groupchat-app-rtbo.onrender.com/getGroupList", {
+      .get("https://groupchat-app-three.vercel.app/getGroupList", {
         headers: {
           Authorisation: token,
         },
@@ -146,7 +146,7 @@ SendButton.addEventListener("click", function () {
     groupId: groupId, // Make sure to send the groupId with the message
   };
   axios
-    .post("https://groupchat-app-rtbo.onrender.com/add-message", Text, {
+    .post("https://groupchat-app-three.vercel.app/add-message", Text, {
       headers: { Authorisation: token },
     })
     .then((response) => {
