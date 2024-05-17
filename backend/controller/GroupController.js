@@ -4,32 +4,44 @@ const Groups = require("../models/Group");
 const Members = require("../models/Members");
 const jwt = require("jsonwebtoken");
 const Admin = require("../models/Admin");
-
+const sq = require("../util/database");
 const { response } = require("express");
-const { where } = require("sequelize");
+const { where, Sequelize } = require("sequelize");
 
 function generateAccessToken(id, admin) {
   return jwt.sign({ userId: id, admin }, "magical-key");
 }
 
 exports.CreateGroup = async (req, res, next) => {
+  const t = await sq.transaction();
   try {
     const GroupName = req.body.name;
     const Uid = req.user.id;
-    const group = await Groups.create({
-      name: GroupName,
-      UserId: Uid,
-    });
-    await Members.create({
-      name: req.user.name,
-      GroupId: req.user.id,
-      IsAdmin: true,
-    });
-    await Admin.create({
-      name: req.user.name,
-      GroupId: req.user.id,
-    });
+    const group = await Groups.create(
+      {
+        name: GroupName,
+        UserId: Uid,
+      },
+      { transaction: t }
+    );
+    await Members.create(
+      {
+        name: req.user.name,
+        GroupId: req.user.id,
+        IsAdmin: true,
+      },
+      { transaction: t }
+    );
+    await Admin.create(
+      {
+        name: req.user.name,
+        GroupId: req.user.id,
+      },
+      { transaction: t }
+    );
     await User.update({ IsAdmin: true }, { where: { id: Uid } });
+
+    await t.commit();
     res.status(201).json({
       group,
       success: true,
@@ -37,6 +49,7 @@ exports.CreateGroup = async (req, res, next) => {
       token: generateAccessToken(Uid, true),
     });
   } catch (err) {
+    await t.rollback();
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -70,6 +83,7 @@ exports.ShowMembers = async (req, res, next) => {
 };
 
 exports.RemoveUser = async (req, res, next) => {
+  const t=sq.transaction();
   const Mid = req.params.id;
   console.log(`members id are ------------------${Mid}`);
   await Members.destroy({ where: { id: Mid } });
@@ -77,19 +91,26 @@ exports.RemoveUser = async (req, res, next) => {
 };
 
 exports.MakeAdmin = async (req, res, next) => {
+  const t=sq.transaction()
+ try{
   const Mid = req.params.id;
-  await Members.update({ IsAdmin: true }, { where: { id: Mid } });
-  await User.update({ IsAdmin: true }, { where: { id: Mid } });
-
+  await Members.update({ IsAdmin: true }, { where: { id: Mid } },{transaction:t});
+  await User.update({ IsAdmin: true }, { where: { id: Mid } },{transaction:t});
   const gid = await Members.findOne({
     where: { id: Mid },
     attributes: ["GroupId"],
-  });
+  },{transaction:t});
 
   await Admin.create({
     name: req.params.name,
     GroupId: gid.GroupId,
-  });
-
+  },{transaction:t});
+   await t.commit()
   res.status(201).json({ message: "Admin made successfully" });
+ }
+ catch(err){
+  (await t).rollback()
+  console.log(err)
+  res.status(500).json({message:"something went wrong"});
+ }
 };

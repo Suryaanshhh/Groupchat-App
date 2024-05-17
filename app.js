@@ -10,8 +10,11 @@ const UserRoutes=require('./backend/routes/UserRoute');
 const MessageRoute=require('./backend/routes/MessageRoute');
 const GroupRouts=require('./backend/routes/GroupRoute');
 const Cors=require("cors");
+const path=require('path');
+const helmet=require('helmet');
 const bodyParser = require("body-parser");
 app.use(bodyParser.json({ extended: false }));
+app.use(helmet({contentSecurityPolicy: false}));
 app.use(Cors())
 
 //Routes
@@ -19,6 +22,15 @@ app.use(Cors())
 app.use(UserRoutes);
 app.use(MessageRoute);
 app.use(GroupRouts)
+
+
+
+app.use((req,res)=>{
+    console.log(`url is ${req.url}`)
+    res.sendFile(path.join(__dirname,`frontend${req.url}`))
+  });
+
+
 
 //Db Schema
 
