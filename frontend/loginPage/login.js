@@ -10,7 +10,7 @@ SubmitBtn.addEventListener("click", function (event) {
   };
 
   axios
-    .post(`https://groupchat-app-gamma.vercel.app/login-user/${login.email}`, login)
+    .post(`http://localhost:4000/login-user/${login.email}`, login)
     .then((response) => {
       console.log(response);
       if(response.status == 201) {

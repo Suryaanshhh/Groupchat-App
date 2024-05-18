@@ -17,35 +17,24 @@ exports.CreateGroup = async (req, res, next) => {
   try {
     const GroupName = req.body.name;
     const Uid = req.user.id;
-    const group = await Groups.create(
-      {
-        name: GroupName,
-        UserId: Uid,
-      },
-    );
+    const group = await Groups.create({
+      name: GroupName,
+      UserId: Uid,
+    });
     const GroupId = await Groups.findOne({ where: { name: GroupName } });
     console.log(`GroupId is -----------${GroupId.id}`);
-    await Members.create(
-      {
-        name: req.user.name,
-        GroupId: GroupId.id,
-        IsAdmin: true,
-      },
-      
-    );
-    await Admin.create(
-      {
-        name: req.user.name,
-        GroupId: GroupId.id,
-      },
-      
-    );
-    await User.update(
-      { IsAdmin: true },
-      { where: { id: Uid } }
-    );
+    await Members.create({
+      name: req.user.name,
+      GroupId: GroupId.id,
+      IsAdmin: true,
+      UserId:req.user.id
+    });
+    await Admin.create({
+      name: req.user.name,
+      GroupId: GroupId.id,
+    });
+    await User.update({ IsAdmin: true }, { where: { id: Uid } });
 
- 
     res.status(201).json({
       group,
       success: true,
@@ -53,7 +42,6 @@ exports.CreateGroup = async (req, res, next) => {
       token: generateAccessToken(Uid, true),
     });
   } catch (err) {
-    
     console.log(err);
     res.status(500).json({ message: "Something went wrong" });
   }
@@ -61,10 +49,10 @@ exports.CreateGroup = async (req, res, next) => {
 
 exports.getGroupList = (req, res, next) => {
   Groups.findAll({
-    where: {
-      UserId: req.user.id,
+    include: {
+      model: Members,
+      where: { id: req.user.id },
     },
-    attributes: ["name", "id"],
   })
     .then((name) => {
       res.status(200).json({ name });
@@ -129,7 +117,7 @@ exports.MakeAdmin = async (req, res, next) => {
     await t.commit();
     res.status(201).json({ message: "Admin made successfully" });
   } catch (err) {
-    (await t).rollback()
+    (await t).rollback();
     console.log(err);
     res.status(500).json({ message: "something went wrong" });
   }

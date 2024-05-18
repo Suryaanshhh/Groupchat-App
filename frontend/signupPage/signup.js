@@ -14,7 +14,7 @@ submitBtn.addEventListener("click", function (event) {
   };
   if (name&&email&&password&&phone) {
     axios
-      .post("https://groupchat-app-gamma.vercel.app/register-user", RegisterUser)
+      .post("http://localhost:4000/register-user", RegisterUser)
       .then((response) => {
         console.log(response)
             alert("Signup Successfull");

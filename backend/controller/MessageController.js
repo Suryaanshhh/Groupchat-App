@@ -4,26 +4,49 @@ const Group = require("../models/Group");
 const { response } = require("express");
 const sq = require("sequelize");
 const Sequelize=require('../util/database');
+const { Socket } = require("socket.io");
+
+
+
+
 
 exports.AddMessage = async (req, res, next) => {
-  const t=Sequelize.transaction()
   try {
     const Message = req.body.Message;
     const Id = req.user.id;
-    const Gid = req.body.groupId
-    //console.log(`ihafdoiha0wfh0awjf-----${Gid}`)
+    const Gid = req.body.groupId;
 
-    const response = await Messages.create({
+    const newMessage = await Messages.create({
       content: Message,
       UserId: Id,
       GroupId: Gid,
     });
-    res.status(201).json({ response, message: "Sent successfully" });
+
+    const messageWithUser = await Messages.findOne({
+      where: { id:newMessage.id },
+      include: [
+        {
+          model: User,
+          attributes: ['name'],
+        },
+        {
+          model: Group,
+          attributes: ['name', 'id'],
+        },
+      ],
+    });
+
+    // Emit the new message to all connected clients
+    req.io.emit('newMessage', messageWithUser);
+
+    res.status(201).json({ response: messageWithUser, message: 'Sent successfully' });
   } catch (err) {
     console.log(err);
-    res.status(500).json({ message: "Something went wrong" });
+    res.status(500).json({ message: 'Something went wrong' });
   }
 };
+
+
 
 exports.GetMessage = async (req, res, next) => {
   const Id = req.user.id;
