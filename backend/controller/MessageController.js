@@ -9,14 +9,13 @@ const AWS = require('aws-sdk');
 const multer = require('multer');
 
 
-// AWS S3 Configuration
 const s3 = new AWS.S3({
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
 });
 const bucketName = "chatapp1";
 
-// Multer configuration
+
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage }).single("file");
 
@@ -73,7 +72,7 @@ exports.AddMessage = async (req, res, next) => {
         ],
       });
 
-      // Emit the new message to all connected clients
+      
       req.io.emit("newMessage", messageWithUser);
 
       res
@@ -93,7 +92,7 @@ exports.GetMessage = async (req, res, next) => {
   if (messageId === undefined) {
     messageId = -1;
   }
-  //console.log(`mesdawefawfa----${messageId}`);
+ 
   const GroupID = req.query.groupId || 1;
   console.log(`GiD--------is ${req.query.groupId}`);
   await Messages.findAll({

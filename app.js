@@ -9,6 +9,7 @@ const Messages = require("./backend/models/message");
 const Group = require("./backend/models/Group");
 const Member = require("./backend/models/Members");
 const Admin = require("./backend/models/Admin");
+const ArchivedChats=require('./backend/models/ArchiveChats');
 const sq = require("./backend/util/database");
 const UserRoutes = require("./backend/routes/UserRoute");
 const MessageRoute = require("./backend/routes/MessageRoute");
@@ -17,6 +18,8 @@ const Cors = require("cors");
 const path = require("path");
 const helmet = require("helmet");
 const bodyParser = require("body-parser");
+const startCronJob=require('./backend/controller/Archive');
+const { CronJob } = require("cron");
 app.use(bodyParser.json({ extended: false }));
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(Cors());
@@ -56,8 +59,13 @@ Group.hasMany(Member);
 Member.belongsTo(Group);
 Group.hasMany(Admin);
 Admin.belongsTo(Group);
+ArchivedChats.belongsTo(User);
+ArchivedChats.belongsTo(Group);
 
 sq.sync();
+
+startCronJob()
+
 
 server.listen(4000 || process.env.PORT, () => {
   console.log('Server is running on port 4000');

@@ -12,10 +12,10 @@ window.addEventListener("DOMContentLoaded", function () {
     ShowMessages(message);
   });
 
-  // Fetch user's groups after login
+  
   fetchUserGroups();
 
-  // Fetch members
+  
   axios
     .get("http://localhost:4000/showMembers", {
       headers: { Authorisation: token },
@@ -29,7 +29,6 @@ window.addEventListener("DOMContentLoaded", function () {
       }
     });
 
-  // Fetch and display messages for the current group
   const groupId = localStorage.getItem("Gid");
   if (groupId) {
     fetchGroupMessages(groupId);
@@ -68,9 +67,8 @@ window.addEventListener("DOMContentLoaded", function () {
       );
 
       console.log(response);
-      socket.emit("newMessage", response.data.response); // Emit the new message event
+      socket.emit("newMessage", response.data.response); 
 
-      // Clear the input fields
       document.getElementById("messageContent").value = "";
       document.getElementById("fileInput").value = "";
     } catch (err) {
@@ -81,7 +79,7 @@ window.addEventListener("DOMContentLoaded", function () {
   function ShowMessages(message) {
     const MessageDiv = document.getElementById("message");
     const Li = document.createElement("li");
-    Li.classList.add("mb-2"); // Adding some margin to each message for better spacing
+    Li.classList.add("mb-2"); 
 
     const messageContent = document.createElement("div");
     messageContent.textContent = `${message.User.name} : ${message.content}`;
@@ -114,7 +112,7 @@ window.addEventListener("DOMContentLoaded", function () {
     }
 
     MessageDiv.appendChild(Li);
-    MessageDiv.scrollTop = MessageDiv.scrollHeight; // Scroll to the bottom
+    MessageDiv.scrollTop = MessageDiv.scrollHeight; 
   }
 
   function fetchUserGroups() {
@@ -125,7 +123,7 @@ window.addEventListener("DOMContentLoaded", function () {
       .then((response) => {
         const groups = response.data.name;
         const groupListElement = document.getElementById("groupList");
-        groupListElement.innerHTML = ""; // Clear existing groups
+        groupListElement.innerHTML = ""; 
 
         groups.forEach((group) => {
           const li = document.createElement("li");
@@ -151,7 +149,7 @@ window.addEventListener("DOMContentLoaded", function () {
       .then((response) => {
         const messages = response.data.messages;
         const MessageDiv = document.getElementById("message");
-        MessageDiv.innerHTML = ""; // Clear existing messages
+        MessageDiv.innerHTML = ""; 
 
         messages.forEach((message) => {
           ShowMessages(message);
@@ -235,7 +233,7 @@ window.addEventListener("DOMContentLoaded", function () {
   function handleGrpNameClick(id, groupName) {
     localStorage.setItem("Gid", id);
     ShowGroupName(groupName);
-    fetchGroupMessages(id); // Fetch messages for the selected group
+    fetchGroupMessages(id); 
   }
 
   const Invite = document.getElementById("InviteUser");
