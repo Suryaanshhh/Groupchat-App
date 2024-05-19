@@ -1,7 +1,7 @@
 window.addEventListener("DOMContentLoaded", function () {
   const token = localStorage.getItem("token");
   const decodedToken = parseJwt(token);
-  const socket = io("http://localhost:4000");
+  const socket = io("https://groupchat-app-rtbo.onrender.com");
 
   socket.on("connect", () => {
     console.log("Connected to Socket.io server");
@@ -17,7 +17,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   
   axios
-    .get("http://localhost:4000/showMembers", {
+    .get("https://groupchat-app-rtbo.onrender.com/showMembers", {
       headers: { Authorisation: token },
     })
     .then((Response) => {
@@ -56,7 +56,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     try {
       const response = await axios.post(
-        "http://localhost:4000/add-message",
+        "https://groupchat-app-rtbo.onrender.com/add-message",
         formData,
         {
           headers: {
@@ -117,7 +117,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   function fetchUserGroups() {
     axios
-      .get("http://localhost:4000/getGroupList", {
+      .get("https://groupchat-app-rtbo.onrender.com/getGroupList", {
         headers: { Authorisation: token },
       })
       .then((response) => {
@@ -143,7 +143,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   function fetchGroupMessages(groupId) {
     axios
-      .get(`http://localhost:4000/get-message?groupId=${groupId}`, {
+      .get(`https://groupchat-app-rtbo.onrender.com/get-message?groupId=${groupId}`, {
         headers: { Authorisation: token },
       })
       .then((response) => {
@@ -191,7 +191,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
     Btn1.addEventListener("click", function removeUser() {
       axios
-        .delete(`http://localhost:4000/RemoveMember/${Child.id}`)
+        .delete(`https://groupchat-app-rtbo.onrender.com/RemoveMember/${Child.id}`)
         .then(() => {
           alert("User removed from group");
           location.reload();
@@ -201,7 +201,7 @@ window.addEventListener("DOMContentLoaded", function () {
     Btn2.addEventListener("click", function MakeAdmin() {
       axios
         .post(
-          `http://localhost:4000/MakeAdmin/${Child.id}/${Child.name}`,
+          `https://groupchat-app-rtbo.onrender.com/MakeAdmin/${Child.id}/${Child.name}`,
           {
             status: true,
           },

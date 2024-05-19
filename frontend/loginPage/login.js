@@ -10,7 +10,7 @@ SubmitBtn.addEventListener("click", function (event) {
   };
 
   axios
-    .post(`http://localhost:4000/login-user/${login.email}`, login)
+    .post(`https://groupchat-app-rtbo.onrender.com/login-user/${login.email}`, login)
     .then((response) => {
       console.log(response);
       if(response.status == 201) {
