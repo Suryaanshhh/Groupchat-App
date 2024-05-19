@@ -12,6 +12,9 @@ const Messages=sq.define("Messages",{
       content: {
         type: Sequelize.STRING,
         allowNull: false,
+      },
+      fileUrl: {
+        type: Sequelize.STRING,
       }
 });
 

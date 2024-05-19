@@ -7,8 +7,8 @@ window.addEventListener("DOMContentLoaded", function () {
     console.log("Connected to Socket.io server");
   });
 
-  socket.on('newMessage', (message) => {
-    console.log('New message received:', message);
+  socket.on("newMessage", (message) => {
+    console.log("New message received:", message);
     ShowMessages(message);
   });
 
@@ -16,16 +16,18 @@ window.addEventListener("DOMContentLoaded", function () {
   fetchUserGroups();
 
   // Fetch members
-  axios.get("http://localhost:4000/showMembers", {
-    headers: { Authorisation: token },
-  }).then((Response) => {
-    console.log(Response);
-    if (decodedToken.admin) {
-      for (let i = 0; i < Response.data.peopeles.length; i++) {
-        showMembers(Response.data.peopeles[i]);
+  axios
+    .get("http://localhost:4000/showMembers", {
+      headers: { Authorisation: token },
+    })
+    .then((Response) => {
+      console.log(Response);
+      if (decodedToken.admin) {
+        for (let i = 0; i < Response.data.peopeles.length; i++) {
+          showMembers(Response.data.peopeles[i]);
+        }
       }
-    }
-  });
+    });
 
   // Fetch and display messages for the current group
   const groupId = localStorage.getItem("Gid");
@@ -34,68 +36,130 @@ window.addEventListener("DOMContentLoaded", function () {
   }
 
   const SendButton = document.getElementById("Send");
-  SendButton.addEventListener("click", function () {
-    const MessageContent = document.getElementById("messageContent").value;
+  SendButton.addEventListener("click", async () => {
+    const messageContent = document
+      .getElementById("messageContent")
+      .value.trim();
+    const fileInput = document.getElementById("fileInput").files[0];
     const groupId = localStorage.getItem("Gid");
-    const Text = {
-      Message: MessageContent,
-      groupId: groupId,
-    };
 
-    axios.post("http://localhost:4000/add-message", Text, {
-      headers: { Authorisation: token },
-    }).then((response) => {
+    if (!messageContent && !fileInput) {
+      alert("Please enter a message or select a file to send.");
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append("message", messageContent);
+    formData.append("groupId", groupId);
+    if (fileInput) {
+      formData.append("file", fileInput);
+    }
+
+    try {
+      const response = await axios.post(
+        "http://localhost:4000/add-message",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorisation: token,
+          },
+        }
+      );
+
       console.log(response);
       socket.emit("newMessage", response.data.response); // Emit the new message event
-    }).catch((err) => {
+
+      // Clear the input fields
+      document.getElementById("messageContent").value = "";
+      document.getElementById("fileInput").value = "";
+    } catch (err) {
       console.log(err);
-    });
+    }
   });
 
   function ShowMessages(message) {
     const MessageDiv = document.getElementById("message");
     const Li = document.createElement("li");
-    Li.textContent = `${message.User.name} : ${message.content}`;
+    Li.classList.add("mb-2"); // Adding some margin to each message for better spacing
+
+    const messageContent = document.createElement("div");
+    messageContent.textContent = `${message.User.name} : ${message.content}`;
+
+    Li.appendChild(messageContent);
+
+    if (message.fileUrl) {
+      const fileExtension = message.fileUrl.split(".").pop().toLowerCase();
+
+      if (["jpg", "jpeg", "png", "gif"].includes(fileExtension)) {
+        const img = document.createElement("img");
+        img.src = message.fileUrl;
+        img.alt = message.content;
+        img.width = 320; // Set width as required
+        img.height = 240; // Set height as required
+        img.classList.add("mt-2"); // Adding some margin-top for spacing
+        Li.appendChild(img);
+      } else if (["mp4", "webm"].includes(fileExtension)) {
+        const video = document.createElement("video");
+        video.width = 320; // Set width as required
+        video.height = 240; // Set height as required
+        video.controls = true;
+        const source = document.createElement("source");
+        source.src = message.fileUrl;
+        source.type = `video/${fileExtension}`;
+        video.appendChild(source);
+        video.classList.add("mt-2"); // Adding some margin-top for spacing
+        Li.appendChild(video);
+      }
+    }
+
     MessageDiv.appendChild(Li);
+    MessageDiv.scrollTop = MessageDiv.scrollHeight; // Scroll to the bottom
   }
 
   function fetchUserGroups() {
-    axios.get("http://localhost:4000/getGroupList", {
-      headers: { Authorisation: token },
-    }).then((response) => {
-      const groups = response.data.name;
-      const groupListElement = document.getElementById("groupList");
-      groupListElement.innerHTML = ""; // Clear existing groups
+    axios
+      .get("http://localhost:4000/getGroupList", {
+        headers: { Authorisation: token },
+      })
+      .then((response) => {
+        const groups = response.data.name;
+        const groupListElement = document.getElementById("groupList");
+        groupListElement.innerHTML = ""; // Clear existing groups
 
-      groups.forEach((group) => {
-        const li = document.createElement("li");
-        const button = document.createElement("button");
-        button.textContent = group.name;
-        button.setAttribute("data-id", group.id);
-        button.setAttribute("data-name", group.name);
-        button.id = "groupListButton";
-        li.appendChild(button);
-        groupListElement.appendChild(li);
+        groups.forEach((group) => {
+          const li = document.createElement("li");
+          const button = document.createElement("button");
+          button.textContent = group.name;
+          button.setAttribute("data-id", group.id);
+          button.setAttribute("data-name", group.name);
+          button.id = "groupListButton";
+          li.appendChild(button);
+          groupListElement.appendChild(li);
+        });
+      })
+      .catch((err) => {
+        console.log("Error fetching user groups:", err);
       });
-    }).catch((err) => {
-      console.log("Error fetching user groups:", err);
-    });
   }
 
   function fetchGroupMessages(groupId) {
-    axios.get(`http://localhost:4000/get-message?groupId=${groupId}`, {
-      headers: { Authorisation: token },
-    }).then((response) => {
-      const messages = response.data.messages;
-      const MessageDiv = document.getElementById("message");
-      MessageDiv.innerHTML = ""; // Clear existing messages
+    axios
+      .get(`http://localhost:4000/get-message?groupId=${groupId}`, {
+        headers: { Authorisation: token },
+      })
+      .then((response) => {
+        const messages = response.data.messages;
+        const MessageDiv = document.getElementById("message");
+        MessageDiv.innerHTML = ""; // Clear existing messages
 
-      messages.forEach((message) => {
-        ShowMessages(message);
+        messages.forEach((message) => {
+          ShowMessages(message);
+        });
+      })
+      .catch((err) => {
+        console.log("Error fetching group messages:", err);
       });
-    }).catch((err) => {
-      console.log("Error fetching group messages:", err);
-    });
   }
 
   document.addEventListener("click", function (event) {
@@ -128,23 +192,32 @@ window.addEventListener("DOMContentLoaded", function () {
     UserDiv.appendChild(Child);
 
     Btn1.addEventListener("click", function removeUser() {
-      axios.delete(`http://localhost:4000/RemoveMember/${Child.id}`).then(() => {
-        alert("User removed from group");
-        location.reload();
-      });
+      axios
+        .delete(`http://localhost:4000/RemoveMember/${Child.id}`)
+        .then(() => {
+          alert("User removed from group");
+          location.reload();
+        });
     });
 
     Btn2.addEventListener("click", function MakeAdmin() {
-      axios.post(`http://localhost:4000/MakeAdmin/${Child.id}/${Child.name}`, {
-        status: true,
-      }, {
-        headers: { Authorisation: token },
-      }).then(() => {
-        alert("Admin made successfully");
-        location.reload();
-      }).catch((err) => {
-        console.log(err);
-      });
+      axios
+        .post(
+          `http://localhost:4000/MakeAdmin/${Child.id}/${Child.name}`,
+          {
+            status: true,
+          },
+          {
+            headers: { Authorisation: token },
+          }
+        )
+        .then(() => {
+          alert("Admin made successfully");
+          location.reload();
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     });
   }
 
@@ -173,9 +246,15 @@ window.addEventListener("DOMContentLoaded", function () {
   function parseJwt(token) {
     var base64Url = token.split(".")[1];
     var base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
-    var jsonPayload = decodeURIComponent(window.atob(base64).split("").map(function (c) {
-      return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
-    }).join(""));
+    var jsonPayload = decodeURIComponent(
+      window
+        .atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
 
     return JSON.parse(jsonPayload);
   }

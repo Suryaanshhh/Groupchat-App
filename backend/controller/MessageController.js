@@ -3,50 +3,88 @@ const Messages = require("../models/message");
 const Group = require("../models/Group");
 const { response } = require("express");
 const sq = require("sequelize");
-const Sequelize=require('../util/database');
+const Sequelize = require("../util/database");
 const { Socket } = require("socket.io");
+const AWS = require('aws-sdk');
+const multer = require('multer');
 
 
+// AWS S3 Configuration
+const s3 = new AWS.S3({
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+});
+const bucketName = "chatapp1";
 
-
+// Multer configuration
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage }).single("file");
 
 exports.AddMessage = async (req, res, next) => {
-  try {
-    const Message = req.body.Message;
-    const Id = req.user.id;
-    const Gid = req.body.groupId;
+  upload(req, res, async function (err) {
+    if (err) {
+      console.error("Error uploading file:", err);
+      return res.status(500).json({ message: "File upload failed" });
+    }
 
-    const newMessage = await Messages.create({
-      content: Message,
-      UserId: Id,
-      GroupId: Gid,
-    });
+    try {
+      const messageContent = req.body.message;
+      const userId = req.user.id;
+      const groupId = req.body.groupId;
+      let fileUrl = null;
 
-    const messageWithUser = await Messages.findOne({
-      where: { id:newMessage.id },
-      include: [
-        {
-          model: User,
-          attributes: ['name'],
-        },
-        {
-          model: Group,
-          attributes: ['name', 'id'],
-        },
-      ],
-    });
+      if (req.file) {
+        const fileName = Date.now() + "-" + req.file.originalname;
+        const params = {
+          Bucket: bucketName,
+          Key: fileName,
+          Body: req.file.buffer,
+          ContentType: req.file.mimetype,
+          ACL:'public-read'
+        };
 
-    // Emit the new message to all connected clients
-    req.io.emit('newMessage', messageWithUser);
+        try {
+          const data = await s3.upload(params).promise();
+          fileUrl = data.Location;
+        } catch (s3Error) {
+          console.error("Error uploading file to S3:", s3Error);
+          return res.status(500).json({ message: "File upload to S3 failed" });
+        }
+      }
 
-    res.status(201).json({ response: messageWithUser, message: 'Sent successfully' });
-  } catch (err) {
-    console.log(err);
-    res.status(500).json({ message: 'Something went wrong' });
-  }
+      const newMessage = await Messages.create({
+        content: messageContent,
+        fileUrl: fileUrl,
+        UserId: userId,
+        GroupId: groupId,
+      });
+
+      const messageWithUser = await Messages.findOne({
+        where: { id: newMessage.id },
+        include: [
+          {
+            model: User,
+            attributes: ["name"],
+          },
+          {
+            model: Group,
+            attributes: ["name", "id"],
+          },
+        ],
+      });
+
+      // Emit the new message to all connected clients
+      req.io.emit("newMessage", messageWithUser);
+
+      res
+        .status(201)
+        .json({ response: messageWithUser, message: "Sent successfully" });
+    } catch (err) {
+      console.log(err);
+      res.status(500).json({ message: "Something went wrong" });
+    }
+  });
 };
-
-
 
 exports.GetMessage = async (req, res, next) => {
   const Id = req.user.id;
@@ -55,7 +93,7 @@ exports.GetMessage = async (req, res, next) => {
   if (messageId === undefined) {
     messageId = -1;
   }
-console.log(`mesdawefawfa----${messageId}`)
+  //console.log(`mesdawefawfa----${messageId}`);
   const GroupID = req.query.groupId || 1;
   console.log(`GiD--------is ${req.query.groupId}`);
   await Messages.findAll({
@@ -72,7 +110,7 @@ console.log(`mesdawefawfa----${messageId}`)
       },
       {
         model: Group,
-        attributes: ["name","id"],
+        attributes: ["name", "id"],
       },
     ],
   })
